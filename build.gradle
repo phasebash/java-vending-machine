@@ -1,0 +1,62 @@
+apply plugin: 'base'
+
+buildscript {
+}
+
+allprojects {
+    group   = 'com.github.phasebash.katas'
+    version = '0.1.0'
+
+    repositories {
+        jcenter()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+
+        options.fork = true
+        options.encoding = "UTF-8"
+    }
+
+    apply plugin: 'groovy'
+    tasks.withType(GroovyCompile) {
+        groovyOptions.optimizationOptions.indy = 'indy'.equals(project.groovyClassifier)
+        groovyOptions.verbose = true
+        groovyOptions.encoding = 'UTF-8'
+        groovyOptions.fork = true
+
+        options.fork = true
+        options.encoding = 'UTF-8'
+        options.verbose = true
+
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
+    dependencies {
+        testCompile(
+
+            [group: 'org.slf4j', name: 'log4j-over-slf4j', version: project.slf4jVersion],
+            [group: 'org.slf4j', name: 'jcl-over-slf4j', version: project.slf4jVersion],
+        )
+        testCompile(group: 'org.spockframework', name: 'spock-core', version: project.spockVersion) {
+            exclude module: 'groovy-all'
+            exclude module: 'junit-dep'
+        }
+        testCompile(group: 'org.gmock', name: 'gmock', version: project.gmockVersion) {
+            exclude module: 'groovy-all'
+        }
+        testCompile(group: 'junit', name: 'junit', version: project.junitVersion) {
+            exclude module: 'hamcrest-core'
+        }
+        compile(
+            [group: 'org.codehaus.groovy', name: 'groovy-all', version: project.groovyVersion, classifier: project.groovyClassifier],
+            [group: 'org.projectlombok', name: 'lombok', version: project.lombokVersion],
+            [group: 'org.slf4j', name: 'slf4j-api', version: project.slf4jVersion],
+        )
+    }
+
+}

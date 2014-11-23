@@ -1,0 +1,16 @@
+description = 'The runnable component of the Java Vending Machine'
+
+apply plugin: 'application'
+
+def mainClass = 'com.github.phasebash.katas.vendingmachine.VendingMachineDemo'
+mainClassName = mainClass
+
+startScripts {
+    mainClassName   = mainClass
+}
+
+dependencies {
+    runtime(
+        [group: 'ch.qos.logback', name: 'logback-classic',  version: project.logbackVersion],
+    )
+}

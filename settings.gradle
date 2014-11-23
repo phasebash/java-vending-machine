@@ -1,0 +1,4 @@
+rootProject.name = 'java-vending-machine'
+
+include 'java-vending-machine-core',
+        'java-vending-machine-demo'
