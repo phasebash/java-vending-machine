@@ -10,6 +10,9 @@ startScripts {
 }
 
 dependencies {
+    compile(
+        project(':java-vending-machine-core')
+    )
     runtime(
         [group: 'ch.qos.logback', name: 'logback-classic',  version: project.logbackVersion],
     )
