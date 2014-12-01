@@ -17,5 +17,5 @@ public interface CoinParser {
      * @return The legit list of coins.  Note: invalid coins should all be represented as UNSUPPORTED.
      */
     @NonNull
-    List<Coin> parseCoins(@NonNull String coinString);
+    List<Coin> parseCoins(String coinString);
 }

@@ -51,7 +51,7 @@ public class DefaultCoinParser implements CoinParser {
         Coin coin = SUPPORTED_COIN_MAP.get(centValue);
 
         if (coin == null) {
-            coin = Coin.builder().value(0).recognized(false).description(centValue).build();
+            coin = Coin.builder().value(0).recognized(false).build();
         }
 
         return coin;
