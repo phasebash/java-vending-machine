@@ -12,6 +12,13 @@ public interface Display {
      *
      * @param message The message.
      */
-    void update(@NonNull String message);
+    void displayText(@NonNull String message);
+
+    /**
+     * Update the display with the given message as currency amount.
+     *
+     * @param amount The amount
+     */
+    void displayCurrency(@NonNull int amount);
 
 }
