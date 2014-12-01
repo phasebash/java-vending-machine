@@ -54,4 +54,16 @@ class BankTest {
         }
     }
 
+    // integration test.
+    @Test
+    void 'should integrate properly with payment calculator and offer correct change'() {
+        play {
+            bank.offerCoins([Coins.quarter(), Coins.quarter(), Coins.dime()])
+
+            List<Coin> coins = bank.pay(50)
+
+            assert coins == [Coins.dime()]
+        }
+    }
+
 }
