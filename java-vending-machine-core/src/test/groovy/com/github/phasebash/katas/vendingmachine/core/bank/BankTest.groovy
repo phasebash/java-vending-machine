@@ -12,9 +12,18 @@ class BankTest {
 
     private Bank bank
 
+    private PaymentCalculator paymentCalculator
+
     @Before
     void setUp() {
-        bank = new Bank(0, 0, 0)
+        paymentCalculator = mock(PaymentCalculator)
+
+        bank = new Bank(10, 10, 10, paymentCalculator)
+    }
+
+    @Test
+    void 'should calculate bank balance correctly'() {
+        assert bank.calculateBankBalance() == 400
     }
 
     @Test
@@ -35,18 +44,6 @@ class BankTest {
         }
     }
 
-    @Test
-    void 'should put paid coins in bank balance and remove current balance'() {
-        play {
-            bank.offerCoins([Coins.quarter(), Coins.quarter()])
-
-            bank.pay(50)
-
-            assert bank.bankBalance == 50
-            assert bank.currentBalance() == 0
-        }
-    }
-
     @Test(expected = InsufficientFundsException)
     void 'should now allow payment when current balance is insufficient'() {
         play {
@@ -54,15 +51,39 @@ class BankTest {
         }
     }
 
+    @Test
+    void 'should be able to make change from the bank'() {
+        bank = new Bank(10, 0, 10, paymentCalculator)
+
+        def coins = [Coins.quarter(), Coins.dime()]
+
+        paymentCalculator.calculatePayment(10, coins).returns([Coins.dime()])
+        paymentCalculator.calculateChange(10, new BankState(10, 0, 10)).returns([Coins.dime()])
+
+        play {
+            bank.offerCoins([Coins.quarter(), Coins.dime()])
+
+            assert [Coins.dime()] == bank.pay(25)
+
+            assert bank.calculateBankBalance() == 310
+            assert bank.currentBalance() == 0
+        }
+    }
+
     // integration test.
     @Test
     void 'should integrate properly with payment calculator and offer correct change'() {
+        def coins = [Coins.quarter(), Coins.quarter(), Coins.dime()]
+
+        paymentCalculator.calculatePayment(10, coins).returns([Coins.dime()])
+        paymentCalculator.calculateChange(10, new BankState(10, 10, 10)).returns([Coins.dime()])
+
         play {
-            bank.offerCoins([Coins.quarter(), Coins.quarter(), Coins.dime()])
+            bank.offerCoins(coins)
 
-            List<Coin> coins = bank.pay(50)
+            List<Coin> change = bank.pay(50)
 
-            assert coins == [Coins.dime()]
+            assert change == [Coins.dime()]
         }
     }
 

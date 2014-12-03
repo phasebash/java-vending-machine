@@ -1,33 +1,32 @@
 package com.github.phasebash.katas.vendingmachine.core.bank;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A class that contains abstractions for dealing with a balance, making change, and debiting.
  */
 public class Bank {
 
-    private static final PaymentCalculator PAYMENT_CALCULATOR = new PaymentCalculator();
-
     // the coins that have been offered for payment.
     private final List<Coin> offered;
 
-    // the coins this bank has with count.
-    private final Map<Coin, Integer> bank;
+    private final PaymentCalculator paymentCalculator;
 
-    // the total monies in the bank.
-    private Integer bankBalance = 0;
+    // immutable.
+    private BankState bankState;
 
-    public Bank(final int quarters, final int dimes, final int nickles) {
-        this.bank = new HashMap<>();
-        this.offered = new LinkedList<>();
-
-        this.bank.put(Coins.quarter(), quarters);
-        this.bank.put(Coins.dime(), dimes);
-        this.bank.put(Coins.nickle(), nickles);
+    /**
+     * Create a bank with initial bank capacities.
+     *
+     * @param quarters The number of quarters.
+     * @param dimes The number of dimes.
+     * @param nickles The number of nickles.
+     */
+    public Bank(final int quarters, final int dimes, final int nickles, final PaymentCalculator paymentCalculator) {
+        this.offered   = new LinkedList<>();
+        this.bankState = new BankState(quarters, dimes, nickles);
+        this.paymentCalculator = paymentCalculator;
     }
 
     /**
@@ -47,29 +46,42 @@ public class Bank {
     public List<Coin> pay(final int cost) {
         final int balance = currentBalance();
 
+        assertFundsAreSufficient(cost, balance);
+
+        final int extra = balance - cost;
+        final List<Coin> bankedCoins = findPaidCoins(extra, offered);
+        final List<Coin> change = findChange(extra);
+
+        refreshBankState(bankedCoins);
+
+        return change;
+    }
+
+    private void assertFundsAreSufficient(final int cost, final int balance) {
         if (balance < cost) {
             throw new InsufficientFundsException();
         }
-
-        final List<Coin> extras = acceptCoins(balance - cost, offered);
-
-        bankBalance += cost;
-
-        offered.clear();
-
-        return extras;
     }
 
-    private List<Coin> acceptCoins(final int cost, final List<Coin> coins) {
-        return PAYMENT_CALCULATOR.calculatePayment(cost, coins);
+    private void refreshBankState(final List<Coin> bankedCoins) {
+        bankState = bankState.plus(BankState.fromCoins(bankedCoins));
+        offered.clear();
+    }
+
+    private List<Coin> findChange(int extra) {
+        return paymentCalculator.calculateChange(extra, bankState);
+    }
+
+    private List<Coin> findPaidCoins(final int cost, final List<Coin> coins) {
+        return paymentCalculator.calculatePayment(cost, coins);
     }
 
     public int currentBalance() {
         return calculateSum(offered);
     }
 
-    public int getBankBalance() {
-        return bankBalance;
+    public int calculateBankBalance() {
+        return bankState.sum();
     }
 
     private int calculateSum(final List<Coin> coins) {
