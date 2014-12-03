@@ -1,28 +1,58 @@
 package com.github.phasebash.katas.vendingmachine.core;
 
+import com.github.phasebash.katas.vendingmachine.core.bank.Bank;
+import com.github.phasebash.katas.vendingmachine.core.bank.Coin;
+import com.github.phasebash.katas.vendingmachine.core.display.Display;
+import com.github.phasebash.katas.vendingmachine.core.input.CoinParser;
+import lombok.NonNull;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Implementation of a vending machine in Java.
  */
 public class VendingMachine {
 
     // private final Inventory inventory;
-    // private final Bank bank;
-    // private final paymentState paymentState;
-    // private final CoinParser coinParser;
+    private final Bank bank;
 
-    // private final Display display;
+    private final CoinParser coinParser;
+
+    private final CoinReturn coinReturn;
+
+    private final Display display;
+
     // private final DisplayBusinessLogic displayBusinessLogic;
 
-    public VendingMachine() {
-        updateDisplay();
+    public VendingMachine(
+                          @NonNull final Bank bank,
+                          @NonNull final Display display,
+                          @NonNull final CoinReturn coinReturn,
+                          @NonNull final CoinParser coinParser) {
+        this.bank       = bank;
+        this.display    = display;
+        this.coinParser = coinParser;
+        this.coinReturn = coinReturn;
+
+        initialState(display);
     }
 
     public void acceptCoins(final String coinString) {
-        // final Coins coins = coinParser.parse(coinString);
-        // getActivePaymentState().add(coins);
+        final List<Coin> coins = coinParser.parseCoins(coinString);
+
+        final List<Coin> acceptable = coins.stream().filter(Coin::isRecognized).collect(Collectors.toList());
+        final List<Coin> rejected   = coins.stream().filter(coin -> !coin.isRecognized()).collect(Collectors.toList());
+
+        coinReturn.returnCoins(rejected);
+        bank.offerCoins(acceptable);
+
+        display.displayCurrency(bank.currentBalance());
     }
 
     public void selectProduct(final String productName) {
+        throw new UnsupportedOperationException("not implemented");
+
         // final Product product = inventory.findProduct(productName);
         // if (ableToDispense(product)) {
         //  dispense(product);
@@ -31,9 +61,8 @@ public class VendingMachine {
         // }
     }
 
-    private void updateDisplay() {
-        // final String displayString = displayBusinessLogic.compute(...);
-        // display.update(displayString);
+    private void initialState(Display display) {
+        display.displayText("INSERT COIN");
     }
 
 }

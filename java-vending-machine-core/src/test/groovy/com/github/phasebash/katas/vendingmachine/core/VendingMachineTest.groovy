@@ -14,12 +14,10 @@ class VendingMachineTest {
 
     @Before
     void setUp() {
-        machine = new VendingMachine()
     }
 
     @Test
     void 'should have a test that matters...'() {
         // stub test until we have an implementation.
-        assert machine
     }
 }
