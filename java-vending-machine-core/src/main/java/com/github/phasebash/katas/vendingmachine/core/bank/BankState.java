@@ -17,12 +17,23 @@ public class BankState {
     private long numberOfDimes;
     private long numberOfNickles;
 
+    /**
+     * Build the total value of this state.
+     *
+     * @return The total value in cents.
+     */
     public int sum() {
         return (Coins.quarter().getValue() * (int) numberOfQuarters) +
                 (Coins.dime().getValue() * (int) numberOfDimes) +
                 (Coins.nickle().getValue() * (int) numberOfNickles);
     }
 
+    /**
+     * Subtract a state from this one and return a new state as the difference.
+     *
+     * @param bankState The right hand side.
+     * @return The difference.
+     */
     public BankState minus(final BankState bankState) {
         return new BankState(
             this.numberOfQuarters     - bankState.getNumberOfQuarters(),
@@ -31,6 +42,12 @@ public class BankState {
         );
     }
 
+    /**
+     * Add a state to this one and return.
+     *
+     * @param bankState The right hand side.
+     * @return The sum.
+     */
     public BankState plus(final BankState bankState) {
         return new BankState(
                 this.numberOfQuarters     + bankState.getNumberOfQuarters(),
@@ -39,6 +56,11 @@ public class BankState {
         );
     }
 
+    /**
+     * Utility method to return this state as a list of coins.
+     *
+     * @return The list of coins.
+     */
     public List<Coin> asCoins() {
         final List<Coin> coins = new LinkedList<>();
 
